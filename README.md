@@ -6,25 +6,6 @@ AI驱动的全维度数据情报洞察中枢系统（新人大赛项目）
 
 ---
 
-## 📁 项目结构
-
-```text
-ai-intel-hub/
-├── backend/                  # 后端中枢系统
-│   ├── app.py
-│   ├── hub/                 # 中枢情报Agent逻辑
-│   ├── agents/              # 专业Agent（市场/政策/技术等）
-│   ├── workflows/           # GraphFlow工作流逻辑
-│   └── tools/               # 工具类（如搜索/数据接入）
-├── frontend/                # 前端用户界面（Vue/React）
-│   └── src/
-├── config/                  # 配置文件
-├── data/                    # 示例数据与资料
-├── tests/                   # 测试代码
-├── docs/                    # 文档与汇报材料
-├── requirements.txt
-└── README.md
-
 ## 🗂️ 项目任务看板说明
 
 本项目使用 GitHub Project 管理任务进度，所有模块任务均已拆解，欢迎同学查看并认领！
@@ -49,3 +30,22 @@ ai-intel-hub/
 3. 每个任务建议创建独立分支开发，提交 Pull Request（PR）
 
 📣 **欢迎大家积极认领任务，共同打造智能中枢系统！**
+
+## 📁 项目结构
+
+```text
+ai-intel-hub/
+├── backend/                  # 后端中枢系统
+│   ├── app.py
+│   ├── hub/                 # 中枢情报Agent逻辑
+│   ├── agents/              # 专业Agent（市场/政策/技术等）
+│   ├── workflows/           # GraphFlow工作流逻辑
+│   └── tools/               # 工具类（如搜索/数据接入）
+├── frontend/                # 前端用户界面（Vue/React）
+│   └── src/
+├── config/                  # 配置文件
+├── data/                    # 示例数据与资料
+├── tests/                   # 测试代码
+├── docs/                    # 文档与汇报材料
+├── requirements.txt
+└── README.md
