@@ -1,6 +1,9 @@
 import aiofiles
 import urllib
 import mistune
+import re
+import os
+from typing import Dict
 
 async def write_to_file(filename: str, text: str) -> None:
     """Asynchronously write text to a file in UTF-8 encoding.
@@ -58,7 +61,7 @@ async def write_md_to_pdf(text: str, filename: str = "") -> str:
     encoded_file_path = urllib.parse.quote(file_path)
     return encoded_file_path
 
-async def write_md_to_word(text: str, filename: str = "") -> str:
+async def write_md_to_word(input_file: str, filename: str = "") -> str:
     """Converts Markdown text to a DOCX file and returns the file path.
 
     Args:
@@ -70,18 +73,13 @@ async def write_md_to_word(text: str, filename: str = "") -> str:
     file_path = f"outputs/{filename[:60]}.docx"
 
     try:
-        from docx import Document
-        from htmldocx import HtmlToDocx
-        # Convert report markdown to HTML
-        html = mistune.html(text)
-        # Create a document object
-        doc = Document()
-        # Convert the html generated from the report to document format
-        HtmlToDocx().add_html_to_document(html, doc)
+        import pypandoc
 
-        # Saving the docx document to file_path
-        doc.save(file_path)
+        # 定义输入和输出文件的路径
 
+
+        # 调用pypandoc库进行转换
+        pypandoc.convert_file(input_file, 'docx', outputfile=file_path)
         print(f"Report written to {file_path}")
 
         encoded_file_path = urllib.parse.quote(file_path)
@@ -90,3 +88,28 @@ async def write_md_to_word(text: str, filename: str = "") -> str:
     except Exception as e:
         print(f"Error in converting Markdown to DOCX: {e}")
         return ""
+    
+
+async def generate_report_files(report: str, filename: str) -> Dict[str, str]:
+    md_path = await write_text_to_md(report, filename)
+    pdf_path = await write_md_to_pdf(report, filename)
+    docx_path = await write_md_to_word(md_path, filename)
+
+    return {"pdf": pdf_path, "docx": docx_path, "md": md_path}
+
+
+def sanitize_filename(filename: str) -> str:
+    # Split into components
+    prefix, timestamp, *task_parts = filename.split('_')
+    task = '_'.join(task_parts)
+    
+    # Calculate max length for task portion
+    # 255 - len(os.getcwd()) - len("\\Seres-Researcher\\outputs\\") - len("task_") - len(timestamp) - len("_.json") - safety_margin
+    max_task_length = 255 - len(os.getcwd()) - 24 - 5 - 10 - 6 - 5  # ~189 chars for task
+    
+    # Truncate task if needed
+    truncated_task = task[:max_task_length] if len(task) > max_task_length else task
+    
+    # Reassemble and clean the filename
+    sanitized = f"{prefix}_{timestamp}_{truncated_task}"
+    return re.sub(r"[^\w\s-]", "", sanitized).strip()

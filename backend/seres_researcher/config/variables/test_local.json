@@ -1,3 +1,5 @@
 {
-  "DOC_PATH": "tests/docs"
+  "DOC_PATH": "./my_docs",
+  "CURATE_SOURCES": "True",
+  "REPORT_FORMAT": "IEEE"
 }

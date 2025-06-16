@@ -18,9 +18,9 @@ class ResearchConductor:
         self.json_handler = get_json_handler()
 
     async def plan_research(self, query, query_domains=None):
-        self.logger.info(f"为以下Query规划研究：{query}")
+        self.logger.info(f"为以下Query制定研究计划：{query}")
         if query_domains:
-            self.logger.info(f"Query领域：{query_domains}")
+            self.logger.info(f"查询域名：{query_domains}")
         
         await stream_output(
             "logs",
@@ -49,11 +49,11 @@ class ResearchConductor:
             cost_callback=self.researcher.add_costs,
             **self.researcher.kwargs
         )
-        self.logger.info(f"研究大纲已规划：{outline}")
+        self.logger.info(f"研究大纲已制定：{outline}")
         return outline
 
     async def conduct_research(self):
-        """运行 Seres 研究者进行研究"""
+        """运行 ResearcherAgent 进行研究"""
         if self.json_handler:
             self.json_handler.update_content("query", self.researcher.query)
         
