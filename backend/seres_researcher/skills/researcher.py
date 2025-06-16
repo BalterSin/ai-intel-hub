@@ -142,11 +142,10 @@ class ResearchConductor:
             await stream_output(
                 "logs",
                 "research_step_finalized",
-                f"研究步骤已完成。\n💸 总研究成本：${self.researcher.get_costs()}",
+                f"研究步骤已完成。\n",
                 self.researcher.websocket,
             )
             if self.json_handler:
-                self.json_handler.update_content("costs", self.researcher.get_costs())
                 self.json_handler.update_content("context", self.researcher.context)
 
         self.logger.info(f"研究已完成。上下文大小：{len(str(self.researcher.context))}")

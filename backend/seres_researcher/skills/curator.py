@@ -27,12 +27,12 @@ class SourceCurator:
         Returns:
             str: Ranked list of source URLs with reasoning
         """
-        print(f"\n\n正在整理 {len(source_data)} 个来源：{source_data}")
+        print(f"\n\n正在验证 {len(source_data)} 个来源：{source_data}")
         if self.researcher.verbose:
             await stream_output(
                 "logs",
                 "research_plan",
-                f"⚖️ 正在根据可信度和相关性评估并整理来源...为确保研究质量和来源准确度，请耐心等待...",
+                f"⚖️ 正在根据可信度和相关性评估并验证来源...为确保研究质量和来源准确度，请耐心等待...",
                 self.researcher.websocket,
             )
 
@@ -59,7 +59,7 @@ class SourceCurator:
                 await stream_output(
                     "logs",
                     "research_plan",
-                    f"🏅 已验证并排名前 {len(curated_sources)} 个最可靠的来源",
+                    f"🏅 已验证并排名前 {len(curated_sources)} 个最可靠的来源，分别是：{curated_sources}",
                     self.researcher.websocket,
                 )
 

@@ -2,7 +2,13 @@ from fastapi import FastAPI
 from seres_researcher import SeresResearcher
 import asyncio
 
+from dotenv import load_dotenv
+load_dotenv()
 app = FastAPI()
+
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to Seres Researcher"}
 
 @app.get("/report/{report_type}")
 async def get_report(query: str, report_type: str) -> dict:

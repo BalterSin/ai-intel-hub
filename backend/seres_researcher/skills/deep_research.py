@@ -342,8 +342,6 @@ Format each question on a new line starting with 'Question: '"""}
         """Run the deep research process and generate final report"""
         start_time = time.time()
 
-        # Log initial costs
-        initial_costs = self.researcher.get_costs()
 
         follow_up_questions = await self.generate_research_plan(self.researcher.query)
         answers = ["Automatically proceeding with research"] * len(follow_up_questions)
@@ -359,16 +357,6 @@ Format each question on a new line starting with 'Question: '"""}
             depth=self.depth,
             on_progress=on_progress
         )
-
-        # Get costs after deep research
-        research_costs = self.researcher.get_costs() - initial_costs
-
-        # Log research costs if we have a log handler
-        if self.researcher.log_handler:
-            await self.researcher._log_event("research", step="deep_research_costs", details={
-                "research_costs": research_costs,
-                "total_costs": self.researcher.get_costs()
-            })
 
         # Prepare context with citations
         context_with_citations = []
@@ -398,7 +386,6 @@ Format each question on a new line starting with 'Question: '"""}
         end_time = time.time()
         execution_time = timedelta(seconds=end_time - start_time)
         logger.info(f"Total research execution time: {execution_time}")
-        logger.info(f"Total research costs: ${research_costs:.2f}")
 
         # Return the context - don't generate report here as it will be done by the main agent
         return self.researcher.context
