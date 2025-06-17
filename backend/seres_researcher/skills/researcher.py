@@ -18,14 +18,14 @@ class ResearchConductor:
         self.json_handler = get_json_handler()
 
     async def plan_research(self, query, query_domains=None):
-        self.logger.info(f"为以下Query规划研究：{query}")
+        self.logger.info(f"为以下Query制定研究计划：{query}")
         if query_domains:
-            self.logger.info(f"Query领域：{query_domains}")
+            self.logger.info(f"查询域名：{query_domains}")
         
         await stream_output(
             "logs",
             "planning_research",
-            f"🌐 浏览网络以了解更多关于任务的信息：{query}...",
+            f"🌐 浏览网络以了解更多关于任务的信息...",
             self.researcher.websocket,
         )
 
@@ -49,11 +49,11 @@ class ResearchConductor:
             cost_callback=self.researcher.add_costs,
             **self.researcher.kwargs
         )
-        self.logger.info(f"研究大纲已规划：{outline}")
+        self.logger.info(f"研究大纲已制定：{outline}")
         return outline
 
     async def conduct_research(self):
-        """运行 Seres 研究者进行研究"""
+        """运行 ResearcherAgent 进行研究"""
         if self.json_handler:
             self.json_handler.update_content("query", self.researcher.query)
         
@@ -142,11 +142,10 @@ class ResearchConductor:
             await stream_output(
                 "logs",
                 "research_step_finalized",
-                f"研究步骤已完成。\n💸 总研究成本：${self.researcher.get_costs()}",
+                f"研究步骤已完成。\n",
                 self.researcher.websocket,
             )
             if self.json_handler:
-                self.json_handler.update_content("costs", self.researcher.get_costs())
                 self.json_handler.update_content("context", self.researcher.context)
 
         self.logger.info(f"研究已完成。上下文大小：{len(str(self.researcher.context))}")
@@ -191,7 +190,7 @@ class ResearchConductor:
             await stream_output(
                 "logs",
                 "subqueries",
-                f"🗂️ 我将基于以下Query进行研究：{sub_queries}...",
+                f"🗂️ 我将基于以下子任务进行研究：{sub_queries[:-1]}...",
                 self.researcher.websocket,
                 True,
                 sub_queries,
@@ -231,7 +230,7 @@ class ResearchConductor:
             await stream_output(
                 "logs",
                 "subqueries",
-                f"🗂️ 我将基于以下Query进行研究：{sub_queries}...",
+                f"🗂️ 我将基于以下子任务进行研究：{sub_queries[:-1]}...",
                 self.researcher.websocket,
                 True,
                 sub_queries,

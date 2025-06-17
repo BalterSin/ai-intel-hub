@@ -86,7 +86,7 @@ The response should contain ONLY the list.
         context,
         report_source: str,
         report_format="apa",
-        total_words=1000,
+        total_words=3000,
         tone=None,
         language="english",
     ):
@@ -98,7 +98,36 @@ The response should contain ONLY the list.
 
         reference_prompt = ""
         if report_source == ReportSource.Web.value:
-            reference_prompt = f"""
+            if report_format.lower() == "apa":
+                reference_prompt = f"""
+You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
+MUST NOT repeatedly citing the same source within continuous text.
+Every url should be hyperlinked: [url website](url)
+Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report.
+
+APA Format Examples:
+- In-text citation: According to recent research ([Bloomberg, 2024](url)), AI is advancing rapidly. Multiple studies confirm this trend [Bloomberg et al., 2024](url)).
+- In-text citation (Chinese): 根据最新研究（[科技日报, 2024](url)），人工智能正在快速发展。多项研究证实了这一趋势（[清华大学, 2023](url)；[英伟达, 2024](url)）。
+- Reference list: 
+  Bloomberg. (2024, March 15). Artificial intelligence breakthroughs. [Bloomberg](https://example.com/ai-breakthrough)
+  科技日报. (2024年3月15日). 人工智能突破性进展. [科技日报](https://example.com/ai-breakthrough-cn)
+"""
+            elif report_format.lower() == "ieee":
+                reference_prompt = f"""
+You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
+MUST NOT repeatedly citing the same source within continuous text.
+Every url should be hyperlinked: [url website](url)
+Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report.
+
+IEEE Format Examples:
+- In-text citation: Recent studies have shown significant progress in AI development [[1]](url). This finding is supported by multiple research teams [[2]](url), [[3]-[5]](url).
+- In-text citation (Chinese): 最新研究表明人工智能取得了重大进展 [[1]](url)。这一发现得到了多个研究团队的支持 [[2]](url)，[[3]-[5]](url)。
+- Reference list:
+  [1] Bloomberg, "Artificial Intelligence Breakthroughs," March 15, 2024. Available: https://example.com/ai-breakthrough
+  [2] 科技日报, "人工智能突破性进展," 2024年3月15日. 来源: https://example.com/ai-breakthrough-cn
+"""
+            else:
+                reference_prompt = f"""
 You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
 Every url should be hyperlinked: [url website](url)
 Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report:
@@ -109,6 +138,24 @@ eg: Author, A. A. (Year, Month Date). Title of web page. Website Name. [url webs
             reference_prompt = f"""
 You MUST write all used source document names at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each."
 """
+
+        citation_examples = ""
+        if report_format.lower() == "apa":
+            citation_examples = """
+- Use APA in-text citation format with markdown hyperlinks:
+  - Single author: ([Bloomberg, 2024](url))
+  - Multiple authors: ([Bloomberg et al., 2024](url))
+  - Chinese examples: ([新华网, 2024](url)) or ([张三, 2023](url))
+"""
+        elif report_format.lower() == "ieee":
+            citation_examples = """
+- Use IEEE in-text citation format with markdown hyperlinks:
+  - Single reference: [[1]](url)
+  - Multiple references: [[2]](url), [[3]](url) or [[4]-[6]](url)
+  - Place citations at the end of sentences before punctuation: "...as shown in recent studies [[1]](url)."
+"""
+        else:
+            citation_examples = f"- Use in-text citation references in {report_format} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url))."
 
         tone_prompt = f"Write the report in a {tone.value} tone." if tone else ""
 
@@ -127,12 +174,12 @@ Please follow all of the following guidelines in your report:
 - You MUST prioritize the relevance, reliability, and significance of the sources you use. Choose trusted sources over less reliable ones.
 - You must also prioritize new articles over older articles if the source can be trusted.
 - You MUST NOT include a table of contents. Start from the main report body directly.
-- Use in-text citation references in {report_format} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
+{citation_examples}
 - Don't forget to add a reference list at the end of the report in {report_format} format and full url links without hyperlinks.
 - {reference_prompt}
 - {tone_prompt}
 
-You MUST write the report in the following language: {language}.
+You MUST write the report in the following language: {language}. 
 Please do your best, this is very important to my career.
 Assume that the current date is {date.today()}.
 """
@@ -186,28 +233,69 @@ The response MUST not contain any markdown format or additional text (like ```js
         """
 
         reference_prompt = ""
+        citation_instructions = ""
+        
         if report_source == ReportSource.Web.value:
-            reference_prompt = f"""
-            You MUST include all relevant source urls.
-            Every url should be hyperlinked: [url website](url)
-            """
+            if report_format.lower() == "apa":
+                reference_prompt = f"""
+You MUST include all relevant source urls with proper APA format.
+Every url should be hyperlinked: [url website](url)
+
+APA Format Examples for Bibliography Report:
+- In-text citation: According to Smith (2024), this resource provides comprehensive coverage of the topic ([Smith, 2024](url)).
+- In-text citation (Chinese): 张三(2024)的研究为主题提供了全面见解（[张三, 2024](url)）。
+- Reference entry: Smith, J. (2024). Title of the resource. Publisher. [Resource Name](url)
+"""
+                citation_instructions = """
+- Use APA in-text citation format when referencing sources: ([Author, Year](url))
+- For multiple authors: ([Author1 & Author2, Year](url)) or ([Author1 et al., Year](url))
+- Chinese format: ([作者, 年份](url))
+"""
+            elif report_format.lower() == "ieee":
+                reference_prompt = f"""
+You MUST include all relevant source urls with proper IEEE format.
+Every url should be hyperlinked: [url website](url)
+
+IEEE Format Examples for Bibliography Report:
+- In-text citation: This resource [[1]](url) provides comprehensive coverage, as demonstrated in multiple studies [[2]-[4]](url).
+- In-text citation (Chinese): 该来源 [[1]](url) 提供了全面见解，如多项研究所证明 [[2]-[4]](url)。
+- Reference entry: [1] J. Smith, "Title of the resource," Publisher, Year. [Online]. Available: URL
+"""
+                citation_instructions = """
+- Use IEEE in-text citation format when referencing sources: [[#]](url)
+- For multiple sources: [[1]](url), [[2]](url) or [[1]-[3]](url)
+- Place citations at the end of sentences before punctuation
+"""
+            else:
+                reference_prompt = f"""
+You MUST include all relevant source urls.
+Every url should be hyperlinked: [url website](url)
+"""
+                citation_instructions = f"""
+- Use {report_format.upper()} in-text citation format with markdown hyperlinks: ([in-text citation](url))
+"""
         else:
             reference_prompt = f"""
-            You MUST write all used source document names at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each."
-        """
+You MUST write all used source document names at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
+"""
+            citation_instructions = f"""
+- Use {report_format.upper()} format for document references
+"""
+
+        tone_instruction = f"Write in a {tone.value} tone throughout the report." if tone else ""
 
         return (
             f'"""{context}"""\n\nBased on the above information, generate a bibliography recommendation report for the following'
             f' question or topic: "{question}". The report should provide a detailed analysis of each recommended resource,'
             " explaining how each source can contribute to finding answers to the research question.\n"
             "Focus on the relevance, reliability, and significance of each source.\n"
-            "Ensure that the report is well-structured, informative, in-depth, and follows Markdown syntax.\n"
+            f"Ensure that the report is well-structured, informative, in-depth, and follows {report_format.upper()} format with Markdown syntax.\n"
             "Use markdown tables and other formatting features when appropriate to organize and present information clearly.\n"
             "Include relevant facts, figures, and numbers whenever available.\n"
             f"The report should have a minimum length of {total_words} words.\n"
+            f"{citation_instructions}\n"
             f"You MUST write the report in the following language: {language}.\n"
-            "You MUST include all relevant source urls."
-            "Every url should be hyperlinked: [url website](url)"
+            f"{tone_instruction}\n"
             f"{reference_prompt}"
         )
 
@@ -216,6 +304,7 @@ The response MUST not contain any markdown format or additional text (like ```js
         query_prompt, context, report_source: str, report_format="apa", tone=None, total_words=1000, language: str = "english"
     ):
         return f'"{context}"\n\n{query_prompt}'
+    
 
     @staticmethod
     def generate_outline_report_prompt(
@@ -227,13 +316,42 @@ The response MUST not contain any markdown format or additional text (like ```js
         Returns: str: The outline report prompt for the given question and research summary
         """
 
+        format_instructions = ""
+        if report_format.lower() == "apa":
+            format_instructions = """
+The outline should be structured to accommodate APA format requirements:
+- Include sections for in-text citations in the format ([Author, Year](url))
+- Plan for a reference list section with APA format entries
+- Consider sections that will need multiple source citations
+"""
+        elif report_format.lower() == "ieee":
+            format_instructions = """
+The outline should be structured to accommodate IEEE format requirements:
+- Include sections for in-text citations in the format [[#]](url)
+- Plan for a reference list section with IEEE format entries
+- Consider sections that will need numbered reference citations
+"""
+        else:
+            format_instructions = f"""
+The outline should be structured to accommodate {report_format.upper()} format requirements:
+- Include appropriate sections for in-text citations
+- Plan for a reference list section
+- Consider citation placement within each section
+"""
+
+        tone_instruction = f"The outline should reflect a {tone.value} tone in its structure and content organization." if tone else ""
+
         return (
             f'"""{context}""" Using the above information, generate an outline for a research report in Markdown syntax'
             f' for the following question or topic: "{question}". The outline should provide a well-structured framework'
             " for the research report, including the main sections, subsections, and key points to be covered."
             f" The research report should be detailed, informative, in-depth, and a minimum of {total_words} words."
+            f" The outline should follow {report_format.upper()} format structure."
             " Use appropriate Markdown syntax to format the outline and ensure readability."
             " Consider using markdown tables and other formatting features where they would enhance the presentation of information."
+            f"\n{format_instructions}"
+            f"\n{tone_instruction}"
+            f"\nGenerate the outline in {language} language."
         )
 
     @staticmethod
@@ -260,7 +378,36 @@ The response MUST not contain any markdown format or additional text (like ```js
         """
         reference_prompt = ""
         if report_source == ReportSource.Web.value:
-            reference_prompt = f"""
+            if report_format.lower() == "apa":
+                reference_prompt = f"""
+You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
+MUST NOT repeatedly citing the same source within continuous text.
+Every url should be hyperlinked: [url website](url)
+Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report.
+
+APA Format Examples:
+- In-text citation: According to recent research ([Bloomberg, 2024](url)), AI is advancing rapidly. Multiple studies confirm this trend [Bloomberg et al., 2024](url)).
+- In-text citation (Chinese): 根据最新研究（[科技日报, 2024](url)），人工智能正在快速发展。多项研究证实了这一趋势（[清华大学, 2023](url)；[英伟达, 2024](url)）。
+- Reference list: 
+  Bloomberg. (2024, March 15). Artificial intelligence breakthroughs. [Bloomberg](https://example.com/ai-breakthrough)
+  科技日报. (2024年3月15日). 人工智能突破性进展. [科技日报](https://example.com/ai-breakthrough-cn)
+"""
+            elif report_format.lower() == "ieee":
+                reference_prompt = f"""
+You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
+MUST NOT repeatedly citing the same source within continuous text.
+Every url should be hyperlinked: [url website](url)
+Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report.
+
+IEEE Format Examples:
+- In-text citation: Recent studies have shown significant progress in AI development [[1]](url). This finding is supported by multiple research teams [[2]](url), [[3]-[5]](url).
+- In-text citation (Chinese): 最新研究表明人工智能取得了重大进展 [[1]](url)。这一发现得到了多个研究团队的支持 [[2]](url)，[[3]-[5]](url)。
+- Reference list:
+  [1] Bloomberg, "Artificial Intelligence Breakthroughs," March 15, 2024. Available: https://example.com/ai-breakthrough
+  [2] 科技日报, "人工智能突破性进展," 2024年3月15日. 来源: https://example.com/ai-breakthrough-cn
+"""
+            else:
+                reference_prompt = f"""
 You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
 Every url should be hyperlinked: [url website](url)
 Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report:
@@ -271,6 +418,22 @@ eg: Author, A. A. (Year, Month Date). Title of web page. Website Name. [url webs
             reference_prompt = f"""
 You MUST write all used source document names at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each."
 """
+
+        citation_instructions = ""
+        if report_format.lower() == "apa":
+            citation_instructions = """
+- Use APA in-text citation format with markdown hyperlinks. Examples:
+  - English: Recent findings suggest that AI is transforming healthcare ([Chen, 2024](url)). This is supported by multiple studies ([Anderson & Wilson, 2023](url); [Davis et al., 2024](url)).
+  - Chinese: 研究表明AI正在改变xx行业（[陈明, 2024](url)）。多项研究支持这一观点（[王强和李华, 2023](url)；[张伟等, 2024](url)）。
+"""
+        elif report_format.lower() == "ieee":
+            citation_instructions = """
+- Use IEEE in-text citation format with markdown hyperlinks. Examples:
+  - English: AI applications in healthcare have shown promising results [[1]](url). Several research groups have confirmed these findings [[2]](url), [[3]-[5]](url).
+  - Chinese: AI在xx领域的应用显示出良好前景 [[1]](url)。多个研究小组证实了这些发现 [[2]](url)，[[3]-[5]](url)。
+"""
+        else:
+            citation_instructions = f"- Use in-text citation references in {report_format} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url))."
 
         tone_prompt = f"Write the report in a {tone.value} tone." if tone else ""
 
@@ -298,9 +461,10 @@ Additional requirements:
 - You MUST determine your own concrete and valid opinion based on the given information. Do NOT defer to general and meaningless conclusions.
 - You MUST prioritize the relevance, reliability, and significance of the sources you use. Choose trusted sources over less reliable ones.
 - You must also prioritize new articles over older articles if the source can be trusted.
-- Use in-text citation references in {report_format} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
+{citation_instructions}
 - {tone_prompt}
 - Write in {language}
+
 
 {reference_prompt}
 
@@ -319,19 +483,19 @@ examples:
 task: "should I invest in apple stocks?"
 response:
 {
-    "server": "💰 Finance Agent",
+    "server": "💰 股票投资大师Agent",
     "agent_role_prompt: "You are a seasoned finance analyst AI assistant. Your primary goal is to compose comprehensive, astute, impartial, and methodically arranged financial reports based on provided data and trends."
 }
 task: "could reselling sneakers become profitable?"
 response:
 {
-    "server":  "📈 Business Analyst Agent",
+    "server":  "📈 运动鞋行业商业分析专家Agent",
     "agent_role_prompt": "You are an experienced AI business analyst assistant. Your main objective is to produce comprehensive, insightful, impartial, and systematically structured business reports based on provided business data, market trends, and strategic analysis."
 }
 task: "what are the most interesting sites in Tel Aviv?"
 response:
 {
-    "server":  "🌍 Travel Agent",
+    "server":  "🌍 Tel Aviv旅行专家Agent",
     "agent_role_prompt": "You are a world-travelled AI tour guide assistant. Your main purpose is to draft engaging, insightful, unbiased, and well-structured travel reports on given locations, including history, attractions, and cultural insights."
 }
 """
@@ -404,6 +568,57 @@ and research data:
         tone: Tone = Tone.Objective,
         language: str = "english",
     ) -> str:
+        
+        citation_examples = ""
+        if report_format.upper() == "APA":
+            citation_examples = """
+- You MUST include markdown hyperlinks to relevant source URLs wherever referenced in the report, for example:
+
+    ### Section Header
+
+    This is a sample text showing how to cite sources in APA format ([Author, 2024](url)). When citing multiple sources, use semicolons ([Author A, 2023](url1); [Author B, 2024](url2)).
+    
+    ### 章节标题（APA格式中文示例）
+    
+    这是展示如何在APA格式中添加引用的示例文本（[张三, 2024](url)），（[新华网, 2024](url)）。引用多个来源时使用分号（[李四, 2023](url1)；[王五, 2024](url2)）。
+"""
+        elif report_format.upper() == "IEEE":
+            citation_examples = """
+- You MUST include markdown hyperlinks to relevant source URLs wherever referenced in the report, for example:
+
+    ### Section Header
+
+    This is a sample text showing how to cite sources in IEEE format [[1]](url). When citing multiple sources, you can list them separately [[2]](url1), [[3]](url2) or as a range [[4]-[6]](url).
+    
+    ### 章节标题（IEEE格式中文示例）
+    
+    这是展示如何在IEEE格式中添加引用的示例文本 [[1]](url)。引用多个来源时可以分别列出 [[2]](url1)，[[3]](url2) 或使用范围 [[4]-[6]](url)。
+"""
+        else:
+            citation_examples = """
+- You MUST include markdown hyperlinks to relevant source URLs wherever referenced in the report, for example:
+
+    ### Section Header
+
+    This is a sample text ([in-text citation](url)).
+"""
+
+        format_note = ""
+        if report_format.upper() == "APA":
+            format_note = """
+- You MUST use APA in-text citation format with markdown hyperlinks:
+  - English example: The renewable energy sector has grown significantly ([Johnson, 2024](url))
+  - Chinese example: 可再生能源行业显著增长（[国家能源局, 2024](url)）
+"""
+        elif report_format.upper() == "IEEE":
+            format_note = """
+- You MUST use IEEE in-text citation format with markdown hyperlinks:
+  - English example: The renewable energy sector has grown significantly [[1]](url)
+  - Chinese example: 可再生能源行业显著增长 [[1]](url)
+"""
+        else:
+            format_note = f"- You MUST use in-text citation references in {report_format.upper()} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url))."
+
         return f"""
 Context:
 "{context}"
@@ -417,7 +632,12 @@ Content Focus:
 - Use markdown syntax and follow the {report_format.upper()} format.
 - When presenting data, comparisons, or structured information, use markdown tables to enhance readability.
 
-IMPORTANT:Content and Sections Uniqueness:
+IMPORTANT:
+Writing Guideline：
+- You MUST write the report in the following language: {language}.
+
+
+Content and Sections Uniqueness:
 - This part of the instructions is crucial to ensure the content is unique and does not overlap with existing reports.
 - Carefully review the existing headers and existing written contents provided below before writing any new subsections.
 - Prevent any content that is already covered in the existing written contents.
@@ -438,11 +658,7 @@ IMPORTANT:Content and Sections Uniqueness:
 "Structure and Formatting":
 - As this sub-report will be part of a larger report, include only the main body divided into suitable subtopics without any introduction or conclusion section.
 
-- You MUST include markdown hyperlinks to relevant source URLs wherever referenced in the report, for example:
-
-    ### Section Header
-
-    This is a sample text ([in-text citation](url)).
+{citation_examples}
 
 - Use H2 for the main subtopic header (##) and H3 for subsections (###).
 - Use smaller Markdown headers (e.g., H2 or H3) for content structure, avoiding the largest header (H1) as it will be used for the larger report's heading.
@@ -460,7 +676,7 @@ Assume the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y')} if
 - You MUST write the report in the following language: {language}.
 - The focus MUST be on the main topic! You MUST Leave out any information un-related to it!
 - Must NOT have any introduction, conclusion, summary or reference section.
-- You MUST use in-text citation references in {report_format.upper()} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
+{format_note}
 - You MUST mention the difference between the existing content and the new content in the report if you are adding the similar or same subsections wherever necessary.
 - The report should have a minimum length of {total_words} words.
 - Use an {tone.value} tone throughout the report.
@@ -504,16 +720,35 @@ Provide the draft headers in a list format using markdown syntax, for example:
 
     @staticmethod
     def generate_report_introduction(question: str, research_summary: str = "", language: str = "english", report_format: str = "apa") -> str:
+        
+        citation_instruction = ""
+        if report_format.upper() == "APA":
+            citation_instruction = """
+- You must use APA in-text citation format with markdown hyperlinks:
+  - Format: ([Author, Year](url)) or ([Author1 & Author2, Year](url))
+  - Example: This report examines the latest developments in AI technology ([Smith, 2024](url)), building on previous research ([Brown & Davis, 2023](url)).
+  - Chinese: 本报告基于先前的研究（[王强和李华, 2023](url)），探讨了AI技术的最新发展（[科技网, 2024](url)）。
+"""
+        elif report_format.upper() == "IEEE":
+            citation_instruction = """
+- You must use IEEE in-text citation format with markdown hyperlinks:
+  - Format: [[#]](url) where # is the reference number
+  - Example: This report examines the latest developments in AI technology [[1]](url), building on previous research [[2], [3]](url).
+  - Chinese: 本报告基于先前的研究 [[2], [3]](url)，探讨了AI技术的最新发展 [[1]](url)。
+"""
+        else:
+            citation_instruction = f"- You must use in-text citation references in {report_format.upper()} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url))."
+
         return f"""{research_summary}\n
 Using the above latest information, Prepare a detailed report introduction on the topic -- {question}.
 - The introduction should be succinct, well-structured, informative with markdown syntax.
 - As this introduction will be part of a larger report, do NOT include any other sections, which are generally present in a report.
 - The introduction should be preceded by an H1 heading with a suitable topic for the entire report.
-- You must use in-text citation references in {report_format.upper()} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
+- There should be a fixed section following the topic: "\n\n## Introduction\n\n" or "\n\n## 引言\n\n" decided by the written language.
+{citation_instruction}
 Assume that the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y')} if required.
 - The output must be in {language} language.
 """
-
 
     @staticmethod
     def generate_report_conclusion(query: str, report_content: str, language: str = "english", report_format: str = "apa") -> str:
@@ -528,6 +763,28 @@ Assume that the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y'
         Returns:
             str: A concise conclusion summarizing the report's main findings and implications.
         """
+        
+        citation_format = ""
+        if report_format.upper() == "APA":
+            citation_format = """
+You must use APA in-text citation format with markdown hyperlinks:
+- Format: ([Author, Year](url))
+- English example: In conclusion, this study's findings align with previous research ([Thompson, 2023](url)) and provide new perspectives for future investigations ([Miller & Wilson, 2024](url)).
+- Chinese example: 综上所述，本研究的发现与先前的研究结果一致（[张三, 2023](url)），并为未来的研究提供了新的视角（[新华网, 2024](url)）。
+"""
+        elif report_format.upper() == "IEEE":
+            citation_format = """
+You must use IEEE in-text citation format with markdown hyperlinks:
+- Format: [[#]](url)
+- English example: In conclusion, this study's findings align with previous research [[7]](url) and provide new perspectives for future investigations [[8], [9]](url).
+- Chinese example: 综上所述，本研究的发现与先前的研究结果一致 [[7]](url)，并为未来的研究提供了新的视角 [[8], [9]](url)。
+"""
+        else:
+            citation_format = f"""
+You must use in-text citation references in {report_format.upper()} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
+Example: 综上所述，本研究的发现与先前的研究结果一致（[张三等, 2023](url)），并为未来的研究方向提供了新的视角（[新华网, 2024](url)）。
+"""
+
         prompt = f"""
     Based on the research report below and research task, please write a concise conclusion that summarizes the main findings and their implications:
 
@@ -541,10 +798,10 @@ Assume that the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y'
     3. Discuss any implications or next steps
     4. Be approximately 2-3 paragraphs long
 
-    If there is no "## Conclusion" section title written at the end of the report, please add it to the top of your conclusion.
-    You must use in-text citation references in {report_format.upper()} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
+    If there is no "## Conclusion" or "## 结论" (decided by language) section title written at the end of the report, please add it to the top of your conclusion.
+    {citation_format}
 
-    IMPORTANT: The entire conclusion MUST be written in {language} language.
+    IMPORTANT: The entire conclusion MUST be written in {language} language. 
 
     Write the conclusion:
     """
@@ -552,85 +809,6 @@ Assume that the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y'
         return prompt
 
 
-class GranitePromptFamily(PromptFamily):
-    """Prompts for IBM's granite models"""
-
-
-    def _get_granite_class(self) -> type[PromptFamily]:
-        """Get the right granite prompt family based on the version number"""
-        if "3.3" in self.cfg.smart_llm:
-            return Granite33PromptFamily
-        if "3" in self.cfg.smart_llm:
-            return Granite3PromptFamily
-        # If not a known version, return the default
-        return PromptFamily
-
-    def pretty_print_docs(self, *args, **kwargs) -> str:
-        return self._get_granite_class().pretty_print_docs(*args, **kwargs)
-
-    def join_local_web_documents(self, *args, **kwargs) -> str:
-        return self._get_granite_class().join_local_web_documents(*args, **kwargs)
-
-
-class Granite3PromptFamily(PromptFamily):
-    """Prompts for IBM's granite 3.X models (before 3.3)"""
-
-    _DOCUMENTS_PREFIX = "<|start_of_role|>documents<|end_of_role|>\n"
-    _DOCUMENTS_SUFFIX = "\n<|end_of_text|>"
-
-    @classmethod
-    def pretty_print_docs(cls, docs: list[Document], top_n: int | None = None) -> str:
-        if not docs:
-            return ""
-        all_documents = "\n\n".join([
-            f"Document {doc.metadata.get('source', i)}\n" + \
-            f"Title: {doc.metadata.get('title')}\n" + \
-            doc.page_content
-            for i, doc in enumerate(docs)
-            if top_n is None or i < top_n
-        ])
-        return "".join([cls._DOCUMENTS_PREFIX, all_documents, cls._DOCUMENTS_SUFFIX])
-
-    @classmethod
-    def join_local_web_documents(cls, docs_context: str | list, web_context: str | list) -> str:
-        """Joins local web documents using Granite's preferred format"""
-        if isinstance(docs_context, str) and docs_context.startswith(cls._DOCUMENTS_PREFIX):
-            docs_context = docs_context[len(cls._DOCUMENTS_PREFIX):]
-        if isinstance(web_context, str) and web_context.endswith(cls._DOCUMENTS_SUFFIX):
-            web_context = web_context[:-len(cls._DOCUMENTS_SUFFIX)]
-        all_documents = "\n\n".join([docs_context, web_context])
-        return "".join([cls._DOCUMENTS_PREFIX, all_documents, cls._DOCUMENTS_SUFFIX])
-
-
-class Granite33PromptFamily(PromptFamily):
-    """Prompts for IBM's granite 3.3 models"""
-
-    _DOCUMENT_TEMPLATE = """<|start_of_role|>document {{"document_id": "{document_id}"}}<|end_of_role|>
-{document_content}<|end_of_text|>
-"""
-
-    @staticmethod
-    def _get_content(doc: Document) -> str:
-        doc_content = doc.page_content
-        if title := doc.metadata.get("title"):
-            doc_content = f"Title: {title}\n{doc_content}"
-        return doc_content.strip()
-
-    @classmethod
-    def pretty_print_docs(cls, docs: list[Document], top_n: int | None = None) -> str:
-        return "\n".join([
-            cls._DOCUMENT_TEMPLATE.format(
-                document_id=doc.metadata.get("source", i),
-                document_content=cls._get_content(doc),
-            )
-            for i, doc in enumerate(docs)
-            if top_n is None or i < top_n
-        ])
-
-    @classmethod
-    def join_local_web_documents(cls, docs_context: str | list, web_context: str | list) -> str:
-        """Joins local web documents using Granite's preferred format"""
-        return "\n\n".join([docs_context, web_context])
 
 ## Factory ######################################################################
 
@@ -677,11 +855,6 @@ def get_prompt_by_report_type(
 
 prompt_family_mapping = {
     PromptFamilyEnum.Default.value: PromptFamily,
-    PromptFamilyEnum.Granite.value: GranitePromptFamily,
-    PromptFamilyEnum.Granite3.value: Granite3PromptFamily,
-    PromptFamilyEnum.Granite31.value: Granite3PromptFamily,
-    PromptFamilyEnum.Granite32.value: Granite3PromptFamily,
-    PromptFamilyEnum.Granite33.value: Granite33PromptFamily,
 }
 
 

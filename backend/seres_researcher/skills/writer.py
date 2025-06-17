@@ -180,7 +180,7 @@ class ReportGenerator:
             await stream_output(
                 "logs",
                 "subtopics_generated",
-                f"📊 已为 '{self.researcher.query}' 生成子主题。",
+                f"📊 已为 '{self.researcher.query}' 生成子主题：{subtopics}",
                 self.researcher.websocket,
             )
 

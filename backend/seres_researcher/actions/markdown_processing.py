@@ -85,7 +85,7 @@ def table_of_contents(markdown_text: str) -> str:
 
     try:
         headers = extract_headers(markdown_text)
-        toc = "## Table of Contents\n\n" + generate_table_of_contents(headers)
+        toc = "## 目录\n\n" + generate_table_of_contents(headers)
         return toc
     except Exception as e:
         print("table_of_contents Exception : ", e)
@@ -103,7 +103,7 @@ def add_references(report_markdown: str, visited_urls: set) -> str:
         str: The updated markdown report with added references.
     """
     try:
-        url_markdown = "\n\n\n## References\n\n"
+        url_markdown = "\n\n\n## 参考来源\n\n"
         url_markdown += "".join(f"- [{url}]({url})\n" for url in visited_urls)
         updated_markdown_report = report_markdown + url_markdown
         return updated_markdown_report

@@ -14,7 +14,6 @@ class ReportType(Enum):
 class ReportSource(Enum):
     Web = "web"
     Local = "local"
-    Azure = "azure"
     LangChainDocuments = "langchain_documents"
     LangChainVectorStore = "langchain_vectorstore"
     Static = "static"
@@ -56,8 +55,4 @@ class Tone(Enum):
 class PromptFamily(Enum):
     """Supported prompt families by name"""
     Default = "default"
-    Granite = "granite"
-    Granite3 = "granite3"
-    Granite31 = "granite3.1"
-    Granite32 = "granite3.2"
-    Granite33 = "granite3.3"
+
