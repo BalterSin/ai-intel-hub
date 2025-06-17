@@ -1,3 +1,6 @@
+import urllib.parse
+import urllib.parse
+import urllib.parse
 import aiofiles
 import urllib
 import mistune
@@ -33,6 +36,7 @@ async def write_text_to_md(text: str, filename: str = "") -> str:
     """
     file_path = f"outputs/{filename[:60]}.md"
     await write_to_file(file_path, text)
+    print("text2md: "+ file_path)
     return urllib.parse.quote(file_path)
 
 async def write_md_to_pdf(text: str, filename: str = "") -> str:
@@ -51,7 +55,7 @@ async def write_md_to_pdf(text: str, filename: str = "") -> str:
         md2pdf(file_path,
                md_content=text,
                # md_file_path=f"{file_path}.md",
-               css_file_path="./frontend/pdf_styles.css",
+               css_file_path="./pdf_styles.css",
                base_url=None)
         print(f"Report written to {file_path}")
     except Exception as e:
@@ -74,12 +78,13 @@ async def write_md_to_word(input_file: str, filename: str = "") -> str:
 
     try:
         import pypandoc
+        import urllib
 
         # 定义输入和输出文件的路径
-
+        input_file = urllib.parse.unquote(input_file)
 
         # 调用pypandoc库进行转换
-        pypandoc.convert_file(input_file, 'docx', outputfile=file_path)
+        pypandoc.convert_file(input_file , 'docx', outputfile=file_path)
         print(f"Report written to {file_path}")
 
         encoded_file_path = urllib.parse.quote(file_path)

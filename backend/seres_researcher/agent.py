@@ -34,7 +34,7 @@ class SeresResearcher:
         report_type: str = ReportType.ResearchReport.value,
         report_format: str = "markdown",
         report_source: str = ReportSource.Web.value,
-        tone: Tone = Tone.Objective,
+        tone: Tone = Tone.Analytical,
         source_urls: list[str] | None = None,
         document_urls: list[str] | None = None,
         complement_source_urls: bool = False,

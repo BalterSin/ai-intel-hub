@@ -25,7 +25,7 @@ class ResearchConductor:
         await stream_output(
             "logs",
             "planning_research",
-            f"🌐 浏览网络以了解更多关于任务的信息：{query}...",
+            f"🌐 浏览网络以了解更多关于任务的信息...",
             self.researcher.websocket,
         )
 
@@ -190,7 +190,7 @@ class ResearchConductor:
             await stream_output(
                 "logs",
                 "subqueries",
-                f"🗂️ 我将基于以下Query进行研究：{sub_queries}...",
+                f"🗂️ 我将基于以下子任务进行研究：{sub_queries[:-1]}...",
                 self.researcher.websocket,
                 True,
                 sub_queries,
@@ -230,7 +230,7 @@ class ResearchConductor:
             await stream_output(
                 "logs",
                 "subqueries",
-                f"🗂️ 我将基于以下Query进行研究：{sub_queries}...",
+                f"🗂️ 我将基于以下子任务进行研究：{sub_queries[:-1]}...",
                 self.researcher.websocket,
                 True,
                 sub_queries,

@@ -29,7 +29,7 @@ class AliSearch:
         return Client(config)
 
     def search(self, max_results=7, time_range: str = "NoLimit", industry: Optional[str] = None) -> list[dict[str, str]]:
-        print(f"Searching with query {self.query} using AliSearch...")
+        print(f"正在使用AliSearch搜索相关信息...")
         client = self.create_client()
         request = models.GenericSearchRequest(
             query=self.query,
