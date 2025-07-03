@@ -1,0 +1,33 @@
+
+# AI情报中枢
+
+2025赛力斯AI创意大赛项目
+
+## 安装
+
+### 前提条件
+
+- Pandoc (用于生成Word文档)[windows下载链接](https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-windows-x86_64.msi)
+
+### 依赖安装
+
+```bash
+pip install -r requirements.txt
+```
+
+## 运行应用
+
+```bash
+uvicorn main:app --reload
+```
+这将启动开发服务器。
+
+## 访问前端页面
+
+在浏览器中访问以下地址：
+
+```
+http://localhost:8000
+```
+
+

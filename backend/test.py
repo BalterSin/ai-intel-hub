@@ -28,7 +28,7 @@ async def write_report(query: str, report_type: str, report_source: str ):
     return report, docx_path, pdf_path, md_path
 
 if __name__ == "__main__":
-    query = "调研新能源汽车行业最新进展, 生成一份详细的调研报告, 不少于3000字"
+    query = "调研2025华为HDC大会内容, 生成一份详细的调研报告, 不少于3000字"
     report_type = "research_report" # report_type = "detailed report"(more detail), "deep"(deep research)
     report_source = "web" #report_source="web","local","hybrid", 本地文档存放在my_docs/下
     # 本地文档./my_docs/2025-2030年新能源汽车产业深度调研及未来发展现状趋势预测报告-中国产业研究院.PDF
