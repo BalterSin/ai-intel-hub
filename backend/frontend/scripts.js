@@ -773,7 +773,7 @@ const SeresResearcher = (() => {
       ghCodeBlocks: true,         // GitHub style code blocks
       tables: true,               // Enable tables
       tasklists: true,            // Enable task lists
-      smartIndentationFix: false,  // Fix weird indentation
+      smartIndentationFix: true,  // Fix weird indentation
       simpleLineBreaks: true,     // Treat newlines as <br>
       openLinksInNewWindow: true, // Open links in new tab
       parseImgDimensions: true    // Parse image dimensions from markdown
@@ -815,6 +815,7 @@ const SeresResearcher = (() => {
 
         // Get the current report_type
         const report_type = document.querySelector('select[name="report_type"]').value;
+        
 
         // Determine if we're using detailed_report (the only one that needs special handling)
         const isDetailedReport = report_type === 'detailed_report';
@@ -906,10 +907,29 @@ const SeresResearcher = (() => {
         return;
       }
 
-      const task = document.getElementById('task').value
-      const report_type = document.querySelector(
+      let task = document.getElementById('task').value
+      let report_type = document.querySelector(
         'select[name="report_type"]'
       ).value
+
+      console.log(task);
+
+      if (report_type === 'custom_report1') {
+        task = '生成这两个车型:'+task+'的竞品参数对比表格，对比的参数尽可能全面。只生成表格，禁止输出其他内容。';
+        report_type = 'custom_report';
+      }
+
+      if (report_type === 'custom_report2') {
+        task = '生成对该车型:'+ task +'的舆情分析报告，需要包含网络舆情评价及来源（使用APA格式引用：[url website](url)）、正负观点占比分析等内容，尽量全面。';
+        report_type = 'custom_report';
+      }
+
+      
+
+
+
+      console.log(task);
+
       const report_source = document.querySelector(
         'select[name="report_source"]'
       ).value
@@ -929,6 +949,8 @@ const SeresResearcher = (() => {
           .filter((domain) => domain.length > 0);
       }
 
+      
+
       const requestData = {
         task: task,
         report_type: report_type,
@@ -938,6 +960,10 @@ const SeresResearcher = (() => {
         agent: agent,
         query_domains: query_domains,
       }
+      console.log()
+      
+
+      
 
       // Store the request data for potential reconnection
       lastRequestData = requestData;
