@@ -908,15 +908,25 @@ const SeresResearcher = (() => {
       }
 
       let task = document.getElementById('task').value
-      const report_type = document.querySelector(
+      let report_type = document.querySelector(
         'select[name="report_type"]'
       ).value
 
       console.log(task);
 
-      if (report_type === 'custom_report') {
+      if (report_type === 'custom_report1') {
         task = '生成这两个车型:'+task+'的竞品参数对比表格，对比的参数尽可能全面。只生成表格，禁止输出其他内容。';
+        report_type = 'custom_report';
       }
+
+      if (report_type === 'custom_report2') {
+        task = '生成对该车型:'+ task +'的舆情分析报告，需要包含网络舆情评价及来源（使用APA格式引用：[url website](url)）、正负观点占比分析等内容，尽量全面。';
+        report_type = 'custom_report';
+      }
+
+      
+
+
 
       console.log(task);
 
